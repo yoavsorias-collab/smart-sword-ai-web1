@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Smart Sword AI - Control Panel</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-content">
+                <h1 class="logo">⚔️ Smart Sword AI</h1>
+                <div class="nav-links">
+                    <a href="#home" onclick="switchTab('home')" class="nav-link active">🏠 בית</a>
+                    <a href="#control" onclick="switchTab('control')" class="nav-link">⚔️ בקרה</a>
+                    <a href="#ai" onclick="switchTab('ai')" class="nav-link">🤖 AI</a>
+                    <a href="#battles" onclick="switchTab('battles')" class="nav-link">📊 קרבות</a>
+                    <a href="#training" onclick="switchTab('training')" class="nav-link">🎓 אימון</a>
+                    <a href="#settings" onclick="switchTab('settings')" class="nav-link">⚙️ הגדרות</a>
+                </div>
+                <div class="nav-status">
+                    <span id="connection-status" class="status-badge">🔴 מחובר</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Tab -->
+            <div id="home" class="tab-content active">
+                <div class="dashboard">
+                    <!-- Status Grid -->
+                    <div class="status-grid">
+                        <div class="status-card sword-status">
+                            <div class="status-icon">⚔️</div>
+                            <div class="status-info">
+                                <h3>חרב</h3>
+                                <p id="sword-status-text">✅ מחוברת</p>
+                            </div>
+                        </div>
+
+                        <div class="status-card camera-status">
+                            <div class="status-icon">📹</div>
+                            <div class="status-info">
+                                <h3>מצלמה</h3>
+                                <p id="camera-status-text">✅ פעילה</p>
+                            </div>
+                        </div>
+
+                        <div class="status-card threats-status">
+                            <div class="status-icon">🎯</div>
+                            <div class="status-info">
+                                <h3>איומים</h3>
+                                <p id="threats-count">0</p>
+                            </div>
+                        </div>
+
+                        <div class="status-card ai-status">
+                            <div class="status-icon">🤖</div>
+                            <div class="status-info">
+                                <h3>AI</h3>
+                                <p id="ai-status-text">✅ פעיל</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>📈 ביצועי AI</h3>
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>🎯 התפלגות איומים</h3>
+                            <canvas id="threatsChart"></canvas>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>📊 קרבות</h3>
+                            <canvas id="battlesChart"></canvas>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>🏆 הישגים</h3>
+                            <canvas id="achievementsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Tab -->
+            <div id="control" class="tab-content">
+                <div class="control-panel">
+                    <h2>⚔️ שליטה בחרב</h2>
+
+                    <div class="controls-grid">
+                        <button class="control-btn btn-open" onclick="swordOpen()">
+                            <span class="btn-icon">🔓</span>
+                            <span class="btn-label">פתח</span>
+                        </button>
+
+                        <button class="control-btn btn-close" onclick="swordClose()">
+                            <span class="btn-icon">🔐</span>
+                            <span class="btn-label">סגור</span>
+                        </button>
+
+                        <button class="control-btn btn-stab" onclick="swordStab(3)">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-label">דקור 3x</span>
+                        </button>
+
+                        <button class="control-btn btn-stab-heavy" onclick="swordStab(5)">
+                            <span class="btn-icon">💥</span>
+                            <span class="btn-label">דקור 5x</span>
+                        </button>
+
+                        <button class="control-btn btn-defend" onclick="defendMode()">
+                            <span class="btn-icon">🛡️</span>
+                            <span class="btn-label">הגן</span>
+                        </button>
+
+                        <button class="control-btn btn-attack" onclick="attackMode()">
+                            <span class="btn-icon">🔴</span>
+                            <span class="btn-label">תקוף</span>
+                        </button>
+                    </div>
+
+                    <!-- AI Recommendation -->
+                    <div class="recommendation-section">
+                        <h3>🤖 המלצת AI</h3>
+                        <div id="ai-recommendation" class="recommendation-box">
+                            <p>ממתין למידע AI...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Tab -->
+            <div id="ai" class="tab-content">
+                <div class="ai-panel">
+                    <h2>🤖 מערכת AI</h2>
+
+                    <div class="ai-grid">
+                        <!-- AI Analysis -->
+                        <div class="ai-card">
+                            <h3>📊 ניתוח מצב</h3>
+                            <div id="ai-analysis" class="ai-content">
+                                <p>📍 מצב: <span id="combat-state">IDLE</span></p>
+                                <p>🎯 איומים: <span id="threat-count">0</span></p>
+                                <p>💭 יכולת מומלצת: <span id="recommended-ability">אף אחת</span></p>
+                                <p>📈 סיכון: <span id="risk-level">0</span>%</p>
+                            </div>
+                        </div>
+
+                        <!-- Abilities -->
+                        <div class="ai-card">
+                            <h3>⚡ יכולות זמינות</h3>
+                            <div id="abilities-list" class="abilities-grid">
+                                <!-- יכולות יופיעו כאן -->
+                            </div>
+                        </div>
+
+                        <!-- Tactical Analysis -->
+                        <div class="ai-card">
+                            <h3>🎯 ניתוח טקטי</h3>
+                            <div id="tactical-analysis" class="ai-content">
+                                <p>🛡️ אסטרטגיה: <span id="strategy">STANDBY</span></p>
+                                <p>🔄 נתיבי בריחה: <span id="escape-routes">-</span></p>
+                                <p>📍 עמדה הגנה: <span id="defense-position">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Control -->
+                    <div class="ai-controls">
+                        <button class="btn-primary" onclick="activateAI()">🚀 הפעל AI</button>
+                        <button class="btn-danger" onclick="deactivateAI()">⏹️ כבה AI</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Battles Tab -->
+            <div id="battles" class="tab-content">
+                <div class="battles-panel">
+                    <h2>📊 סטטיסטיקות קרבות</h2>
+
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>קרבות סה"כ</h4>
+                            <p id="total-battles" class="stat-value">0</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <h4>ניצחונות</h4>
+                            <p id="victories" class="stat-value" style="color: #10b981;">0</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <h4>הפסדים</h4>
+                            <p id="defeats" class="stat-value" style="color: #ef4444;">0</p>
+                        </div>
+
+                        <div class="stat-card">
+                            <h4>שיעור ניצחון</h4>
+                            <p id="win-rate" class="stat-value" style="color: #fbbf24;">0%</p>
+                        </div>
+                    </div>
+
+                    <!-- Battle History -->
+                    <div class="battle-history">
+                        <h3>📜 היסטוריית קרבות</h3>
+                        <div id="battles-list" class="battles-list">
+                            <!-- קרבות יופיעו כאן -->
+                        </div>
+                    </div>
+
+                    <!-- Start Battle -->
+                    <button class="btn-primary large-btn" onclick="startBattle()">
+                        ⚔️ התחל קרב חדש
+                    </button>
+                </div>
+            </div>
+
+            <!-- Training Tab -->
+            <div id="training" class="tab-content">
+                <div class="training-panel">
+                    <h2>🎓 מצבי אימון</h2>
+
+                    <!-- Training Modes -->
+                    <div class="training-modes">
+                        <div class="training-mode" onclick="selectTraining('beginner')">
+                            <div class="mode-icon">👶</div>
+                            <h3>מתחיל</h3>
+                            <p>אימון בסיסי להתחלה</p>
+                            <div class="difficulty">⭐ קל</div>
+                        </div>
+
+                        <div class="training-mode" onclick="selectTraining('intermediate')">
+                            <div class="mode-icon">🎯</div>
+                            <h3>בינוני</h3>
+                            <p>קרבות יותר קשים</p>
+                            <div class="difficulty">⭐⭐ בינוני</div>
+                        </div>
+
+                        <div class="training-mode" onclick="selectTraining('advanced')">
+                            <div class="mode-icon">⚔️</div>
+                            <h3>מתקדם</h3>
+                            <p>קרבות אמיתיים</p>
+                            <div class="difficulty">⭐⭐⭐ קשה</div>
+                        </div>
+
+                        <div class="training-mode" onclick="selectTraining('master')">
+                            <div class="mode-icon">👑</div>
+                            <h3>שליט</h3>
+                            <p>האתגר הסופי</p>
+                            <div class="difficulty">⭐⭐⭐⭐ קשה מאד</div>
+                        </div>
+                    </div>
+
+                    <!-- Training Progress -->
+                    <div class="training-progress">
+                        <h3>📈 התקדמות</h3>
+                        <div id="progress-bars" class="progress-bars">
+                            <!-- התקדמות תופיע כאן -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="settings-panel">
+                    <h2>⚙️ הגדרות</h2>
+
+                    <!-- Server Connection -->
+                    <div class="setting-group">
+                        <h3>🌐 חיבור ל-Server</h3>
+                        <input 
+                            type="text" 
+                            id="server-url" 
+                            placeholder="http://192.168.1.100:5000"
+                            class="setting-input"
+                        >
+                        <button class="btn-primary" onclick="testConnection()">
+                            🔗 בדוק חיבור
+                        </button>
+                    </div>
+
+                    <!-- Theme -->
+                    <div class="setting-group">
+                        <h3>🎨 עיצוב</h3>
+                        <select id="theme-select" class="setting-select">
+                            <option value="dark">🌙 אפל</option>
+                            <option value="light">☀️ בהיר</option>
+                            <option value="auto">🔄 אוטומטי</option>
+                        </select>
+                    </div>
+
+                    <!-- Sound -->
+                    <div class="setting-group">
+                        <h3>🔊 קול</h3>
+                        <label class="toggle">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span>הפעל קולות</span>
+                        </label>
+                    </div>
+
+                    <!-- About -->
+                    <div class="setting-group">
+                        <h3>ℹ️ אודות</h3>
+                        <div class="about-info">
+                            <p><strong>Smart Sword AI</strong></p>
+                            <p>גרסה 1.0.0</p>
+                            <p>ממשק שליטה מתקדם ל-מערכת חרב חכמה</p>
+                            <p style="margin-top: 10px; color: #888;">
+                                <a href="https://github.com/yoavsorias/smart-sword-ai-web" target="_blank">
+                                    🔗 GitHub Repository
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/charts.js"></script>
+</body>
+</html>
